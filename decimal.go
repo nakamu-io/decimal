@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
@@ -1324,12 +1323,12 @@ func (d *Decimal) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 	case bsontype.String:
 		str, _, ok := bsoncore.ReadString(data)
 		if !ok {
-			return errors.Errorf("Unable to read string")
+			return fmt.Errorf("unable to read string")
 		}
 
 		*d, err = NewFromString(str)
 	default:
-		return errors.Errorf("Invalid type: %s", t)
+		return fmt.Errorf("invalid type: %s", t)
 	}
 	return err
 }
