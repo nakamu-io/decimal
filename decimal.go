@@ -25,6 +25,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/x/bsonx"
+	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
 // DivisionPrecision is the number of decimal places in the result when it
@@ -1308,6 +1313,32 @@ func (d Decimal) Truncate(precision int32) Decimal {
 		return d.rescale(-precision)
 	}
 	return d
+}
+
+// UnmarshalBSONValue implements the bson.UnmarshalBSONValue interface
+//
+// This adds support for reading decimal values from Mongo
+func (d *Decimal) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	var err error
+	switch t {
+	case bsontype.String:
+		str, _, ok := bsoncore.ReadString(data)
+		if !ok {
+			return errors.Errorf("Unable to read string")
+		}
+
+		*d, err = NewFromString(str)
+	default:
+		return errors.Errorf("Invalid type: %s", t)
+	}
+	return err
+}
+
+// MarshalBSONValue implements the bson.MarshalBSONValue interface
+//
+// This adds support for storing decimal values as strings in Mongo
+func (d Decimal) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	return bsonx.String(d.String()).MarshalBSONValue()
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
