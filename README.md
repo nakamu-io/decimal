@@ -1,9 +1,4 @@
 # decimal
-
-[![Github Actions](https://github.com/shopspring/decimal/actions/workflows/ci.yml/badge.svg)](https://github.com/shopspring/decimal/actions/workflows/ci.yml)
-[![GoDoc](https://godoc.org/github.com/shopspring/decimal?status.svg)](https://godoc.org/github.com/shopspring/decimal) 
-[![Go Report Card](https://goreportcard.com/badge/github.com/shopspring/decimal)](https://goreportcard.com/report/github.com/shopspring/decimal)
-
 Arbitrary-precision fixed-point decimal numbers in go.
 
 _Note:_ Decimal library can "only" represent numbers with a maximum of 2^31 digits after the decimal point.
@@ -18,11 +13,11 @@ _Note:_ Decimal library can "only" represent numbers with a maximum of 2^31 digi
 
 ## Install
 
-Run `go get github.com/shopspring/decimal`
+Run `go get github.com/nakamu-io/decimal`
 
 ## Requirements 
 
-Decimal library requires Go version `>=1.7`
+Decimal library requires Go version `>=1.19`
 
 ## Usage
 
@@ -31,7 +26,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
+	"github.com/nakamu-io/decimal"
 )
 
 func main() {
@@ -59,14 +54,7 @@ func main() {
 }
 ```
 
-## Documentation
 
-http://godoc.org/github.com/shopspring/decimal
-
-## Production Usage
-
-* [Spring](https://shopspring.com/), since August 14, 2014.
-* If you are using this in production, please let us know!
 
 ## FAQ
 
