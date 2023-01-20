@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
@@ -1026,6 +1027,12 @@ func (d Decimal) String() string {
 	return d.string(true)
 }
 
+// Decimal128 returns the Mongo Decimal128 representation of
+// the decimal.
+func (d Decimal) Decimal128() (primitive.Decimal128, error) {
+	return primitive.ParseDecimal128(d.String())
+}
+
 // StringFixed returns a rounded fixed-point string with places digits after
 // the decimal point.
 //
@@ -1327,6 +1334,12 @@ func (d *Decimal) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 		}
 
 		*d, err = NewFromString(str)
+	case bsontype.Decimal128:
+		dec, _, ok := bsoncore.ReadDecimal128(data)
+		if !ok {
+			return fmt.Errorf("unable to read decimal123")
+		}
+		*d, err = NewFromString(dec.String())
 	default:
 		return fmt.Errorf("invalid type: %s", t)
 	}
@@ -1335,9 +1348,13 @@ func (d *Decimal) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 
 // MarshalBSONValue implements the bson.MarshalBSONValue interface
 //
-// This adds support for storing decimal values as strings in Mongo
+// This adds support for storing decimal values as Decimal128 in Mongo
 func (d Decimal) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bsonx.String(d.String()).MarshalBSONValue()
+	dec, err := primitive.ParseDecimal128(d.String())
+	if err != nil {
+		return bsontype.Null, nil, fmt.Errorf("failed to parse decimal string")
+	}
+	return bsonx.Decimal128(dec).MarshalBSONValue()
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
